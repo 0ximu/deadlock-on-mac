@@ -89,6 +89,7 @@ cat > "$TARGET/Contents/Info.plist" <<PLIST
   <key>CFBundleShortVersionString</key><string>1.0</string>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>NSHighResolutionCapable</key><true/>
+  <key>NSMicrophoneUsageDescription</key><string>Deadlock uses the microphone for in-game voice chat.</string>
 </dict>
 </plist>
 PLIST
