@@ -76,6 +76,22 @@ Anything named `wine-preloader` burning hundreds of ms/s that is not your curren
 | Works from Terminal, "unable to write to its folder" from Finder | App Translocation. The generated launcher uses absolute paths to avoid it; do not move the app without re-running `xattr -cr` + `codesign -f -s -` on it. |
 | Random stutter, everything looks idle in `ps` | Orphaned wine processes or background builds. `sudo powermetrics -n 1 -i 3000 --samplers tasks \| head -30` shows the truth; the launcher sweeps orphans on start. |
 | Steam login freezes at the 2FA step | Use the QR code with the Steam mobile app instead. |
+| Opening Deadlock's Settings freezes the game | Older wrappers lack the macOS microphone permission description. See the repair below. |
+
+### Repair Settings freezing on older installs
+
+Opening Settings can trigger microphone access for voice chat, even when game audio is muted. On an affected CrossOver wine build, a wrapper missing `NSMicrophoneUsageDescription` was observed waiting indefinitely for the macOS microphone permission request to finish. New installs include this declaration.
+
+For an existing installation, quit Deadlock and Steam completely, then run the following in Terminal. Change `APP` if you installed elsewhere or renamed the app:
+
+```sh
+APP="$HOME/Applications/Deadlock.app"
+plutil -replace NSMicrophoneUsageDescription -string "Deadlock uses the microphone for in-game voice chat." "$APP/Contents/Info.plist" &&
+  codesign --force --sign - "$APP" &&
+  codesign --verify --verbose=2 "$APP"
+```
+
+Reopen the app from Finder and try Settings again. macOS may ask for microphone access; allow it if you want voice chat. This updates the wrapper's permission description and signature while preserving your installed games and settings.
 
 ## Fine print
 
